@@ -104,6 +104,7 @@ def exit_loop(tool_context: ToolContext) -> dict:
         dict: Status. After calling, output the word "Approved" and stop.
     """
     tool_context.actions.escalate = True
+    tool_context.actions.skip_summarization = True
     if tool_context.state.get("_exit_loop_called"):
         return {
             "status": "noop",
