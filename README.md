@@ -1,6 +1,6 @@
 # ADK Orchestra — A Beginner's Workshop
 
-A hands-on, ~60-minute workshop for building AI agents with **Google ADK**.
+A hands-on, ~90-minute workshop for building AI agents with **Google ADK**.
 
 Open `index.html` in your browser for the full guided walkthrough. This README is just the quick-start.
 

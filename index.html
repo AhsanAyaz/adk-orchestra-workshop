@@ -434,7 +434,7 @@
   <header class="topbar">
     <div class="topbar-mark">A</div>
     <div class="topbar-title">ADK Orchestra — A Beginner's Workshop</div>
-    <div class="topbar-meta">~60 minutes · Python</div>
+    <div class="topbar-meta">~90 minutes · Python</div>
   </header>
 
   <div class="layout">
@@ -466,7 +466,7 @@
         <p class="lead">A friendly, hands-on workshop. You will build five small agents — from a single helper to a full multi-agent pipeline.</p>
 
         <div class="meta-strip">
-          <div><strong>Duration</strong>~60 min</div>
+          <div><strong>Duration</strong>~90 min</div>
           <div><strong>Level</strong>Beginner</div>
           <div><strong>Language</strong>Python 3.10+</div>
           <div><strong>Cost</strong>Free tier OK</div>
@@ -475,6 +475,11 @@
         <h2>What is ADK?</h2>
         <p><strong>ADK</strong> (Agent Development Kit) is Google's open-source toolkit for building AI agents. An agent is a program that uses an LLM (like Gemini) to decide what to do — call tools, run code, chain steps — instead of you hard-coding every branch.</p>
         <p>ADK gives you a few small building blocks. You compose them into anything from a single helper to an orchestra of agents working together.</p>
+
+        <figure class="diagram">
+          <img src="images/four-building-blocks.png" alt="ADK agent taxonomy: BaseAgent splits into LlmAgent, Workflow Agents (Sequential / Parallel / Loop), and Custom Agents" />
+          <figcaption>The ADK agent family — everything you'll build today is one of these.</figcaption>
+        </figure>
 
         <h2>What you will build</h2>
         <ol>
@@ -720,13 +725,10 @@ root_agent = <span class="tok-f">LlmAgent</span>(
         <h1>Chain agents: <code>sequential_pipeline</code></h1>
         <p class="lead">Three agents in a row. The output of each becomes input for the next.</p>
 
-        <div class="flow">
-          <div class="flow-node">CodeWriter</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node">CodeReviewer</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node">CodeRefactorer</div>
-        </div>
+        <figure class="diagram">
+          <img src="images/sequential-agents.png" alt="SequentialAgent flow: Writer → Reviewer → Refactorer, each reading the previous output via session state keys" />
+          <figcaption>Each step writes to <code>output_key</code>; the next step reads it from session state.</figcaption>
+        </figure>
 
         <h2>The big idea: session state</h2>
         <p>Agents pass data through a shared dictionary called <strong>session state</strong>. Two pieces wire it up:</p>
@@ -806,13 +808,10 @@ root_agent = <span class="tok-f">SequentialAgent</span>(
         <h1>Parallel agents: <code>parallel_research</code></h1>
         <p class="lead">Three researchers run at the same time. A synthesizer combines their answers.</p>
 
-        <div class="flow">
-          <div class="flow-node">Renewables</div>
-          <div class="flow-node">EVs</div>
-          <div class="flow-node">Carbon capture</div>
-          <span class="flow-arrow">⇒</span>
-          <div class="flow-node">Synthesizer</div>
-        </div>
+        <figure class="diagram">
+          <img src="images/parallel-agent.png" alt="ParallelAgent fan-out: three researchers run concurrently, each writing a unique output_key, then a synthesizer combines them" />
+          <figcaption>Three concurrent branches, each with a unique <code>output_key</code>, then synthesize.</figcaption>
+        </figure>
 
         <h2>Why parallel?</h2>
         <p>If three lookups don't depend on each other, running them in parallel is dramatically faster than running them in sequence. <code>ParallelAgent</code> kicks them all off, waits for all to finish, then moves on.</p>
@@ -1084,6 +1083,10 @@ root_agent = <span class="tok-f">LlmAgent</span>(
         <p class="lead">Now we compose everything you've learned into one pipeline that produces a polished article from a single topic.</p>
 
         <h2>The architecture</h2>
+        <figure class="diagram">
+          <img src="images/content-orchestra.png" alt="ContentOrchestra: Sequential root containing ResearchTeam → Outliner → Drafter → RefinementLoop" />
+          <figcaption>Four stages, three primitives, one pipeline.</figcaption>
+        </figure>
         <pre><code><span class="tok-c">SequentialAgent (root)</span>
 ├── 1. ResearchTeam       <span class="tok-c"># Sequential — trends, audience, competitors</span>
 ├── 2. Outliner           <span class="tok-c"># Reads research, builds outline</span>
