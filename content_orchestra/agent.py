@@ -98,13 +98,22 @@ drafter = LlmAgent(
 # ── Stage 4: Refinement Loop ──────────────────────────────────────────────
 
 def exit_loop(tool_context: ToolContext) -> dict:
-    """Call ONLY when the draft is clear, accurate, well-structured, and publish-ready.
+    """Signal that the draft is publish-ready and the loop should end.
 
     Returns:
-        dict: Empty — signals the loop to stop.
+        dict: Status. After calling, output the word "Approved" and stop.
     """
     tool_context.actions.escalate = True
-    return {}
+    if tool_context.state.get("_exit_loop_called"):
+        return {
+            "status": "noop",
+            "message": "exit_loop was already called this turn. Do not call it again. Output the word Approved and stop.",
+        }
+    tool_context.state["_exit_loop_called"] = True
+    return {
+        "status": "loop_exited",
+        "message": "Loop terminated. Output the word Approved and stop generating.",
+    }
 
 
 reviser = LlmAgent(

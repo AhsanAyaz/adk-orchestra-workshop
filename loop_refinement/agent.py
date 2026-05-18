@@ -12,14 +12,22 @@ MODEL = "gemini-flash-latest"
 
 
 def exit_loop(tool_context: ToolContext) -> dict:
-    """Call this tool ONCE when the document is clear, complete, and publish-ready.
-    Call it exactly one time and do not call it again.
+    """Signal that the document is publish-ready and the loop should end.
 
     Returns:
-        dict: Status confirmation. The loop will terminate after this call.
+        dict: Status. After calling, output the word "Approved" and stop.
     """
     tool_context.actions.escalate = True
-    return {"status": "loop_exited", "message": "Document approved. Loop terminated."}
+    if tool_context.state.get("_exit_loop_called"):
+        return {
+            "status": "noop",
+            "message": "exit_loop was already called this turn. Do not call it again. Output the word Approved and stop.",
+        }
+    tool_context.state["_exit_loop_called"] = True
+    return {
+        "status": "loop_exited",
+        "message": "Loop terminated. Output the word Approved and stop generating.",
+    }
 
 
 writer = LlmAgent(
