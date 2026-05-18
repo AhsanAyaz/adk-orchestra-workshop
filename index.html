@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADK Orchestra — A Beginner's Workshop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --border: #e7e5e4;
+      --border-strong: #d6d3d1;
+      --text: #1c1917;
+      --text-soft: #57534e;
+      --text-mute: #a8a29e;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --code-bg: #0f172a;
+      --code-text: #e2e8f0;
+      --code-keyword: #f472b6;
+      --code-string: #86efac;
+      --code-comment: #64748b;
+      --code-func: #93c5fd;
+      --code-num: #fbbf24;
+      --tip-bg: #f0fdf4;
+      --tip-border: #16a34a;
+      --note-bg: #eff6ff;
+      --note-border: #2563eb;
+      --warn-bg: #fffbeb;
+      --warn-border: #f59e0b;
+      --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(15,23,42,0.06);
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Hanken Grotesk', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-mark {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+      display: grid; place-items: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.02em;
+    }
+    .topbar-title {
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .topbar-meta {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--text-mute);
+      font-weight: 400;
+    }
+
+    /* ── Layout ───────────────────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 28px 80px;
+      gap: 48px;
+    }
+
+    /* ── Sidebar nav ──────────────────────────────────────── */
+    .sidebar {
+      position: sticky;
+      top: 80px;
+      align-self: start;
+      height: max-content;
+    }
+    .sidebar-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      padding: 0 10px;
+      margin-bottom: 10px;
+    }
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-soft);
+      transition: background 120ms ease, color 120ms ease;
+      user-select: none;
+    }
+    .nav-item:hover { background: rgba(15,23,42,0.04); color: var(--text); }
+    .nav-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #e7e5e4;
+      color: var(--text-soft);
+      display: grid; place-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+      transition: background 120ms ease, color 120ms ease;
+    }
+    .nav-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .nav-item.active .nav-num {
+      background: var(--accent);
+      color: white;
+    }
+    .nav-item.done .nav-num {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    /* ── Main content ─────────────────────────────────────── */
+    .content {
+      min-width: 0;
+    }
+    .step {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 44px 52px;
+      box-shadow: var(--shadow);
+    }
+    .step.visible { display: block; }
+
+    h1, h2, h3, h4 {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      color: var(--text);
+    }
+    h1 { font-size: 30px; margin: 0 0 8px; }
+    h2 { font-size: 22px; margin: 36px 0 12px; }
+    h3 { font-size: 17px; margin: 24px 0 8px; }
+    p { margin: 0 0 14px; color: var(--text); }
+    .lead { font-size: 17px; color: var(--text-soft); margin-bottom: 24px; }
+
+    ul, ol { padding-left: 22px; margin: 0 0 16px; }
+    li { margin: 6px 0; }
+
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+    a:hover { border-bottom-color: var(--accent); }
+
+    strong { font-weight: 600; }
+
+    /* Inline code */
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      background: #f1f5f9;
+      color: #be185d;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #e5e7eb;
+    }
+
+    /* Code blocks */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      margin: 12px 0 20px;
+      position: relative;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+      font-size: inherit;
+    }
+    .tok-k { color: var(--code-keyword); }   /* keyword */
+    .tok-s { color: var(--code-string); }    /* string */
+    .tok-c { color: var(--code-comment); font-style: italic; }
+    .tok-f { color: var(--code-func); }      /* function */
+    .tok-n { color: var(--code-num); }       /* number */
+    .tok-t { color: #fde68a; }                /* type */
+
+    /* Callouts */
+    .callout {
+      border-left: 3px solid;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      margin: 18px 0;
+      font-size: 14.5px;
+    }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .callout.tip  { background: var(--tip-bg);  border-color: var(--tip-border); }
+    .callout.tip .callout-title  { color: #15803d; }
+    .callout.note { background: var(--note-bg); border-color: var(--note-border); }
+    .callout.note .callout-title { color: #1d4ed8; }
+    .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+    .callout.warn .callout-title { color: #b45309; }
+
+    /* Exercise box */
+    .exercise {
+      background: linear-gradient(180deg, #fdf4ff 0%, #fae8ff 100%);
+      border: 1px solid #e9d5ff;
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin: 22px 0;
+    }
+    .exercise-tag {
+      display: inline-block;
+      background: #9333ea;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 10px;
+    }
+    .exercise h3 { margin-top: 0; color: #6b21a8; }
+
+    /* Footer nav */
+    .step-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 44px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      transition: all 120ms ease;
+    }
+    .btn:hover { border-color: var(--text-soft); }
+    .btn.primary {
+      background: var(--text);
+      color: white;
+      border-color: var(--text);
+    }
+    .btn.primary:hover { background: #000; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Hero badge */
+    .badge {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+
+    /* Diagram for pipeline visual */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 18px;
+      background: #f8fafc;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius);
+      margin: 16px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+    .flow-node {
+      background: white;
+      border: 1px solid var(--border-strong);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    .flow-arrow { color: var(--text-mute); }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-weight: 600;
+      color: var(--text-soft);
+      background: #f8fafc;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Diagram (image) */
+    .diagram {
+      margin: 18px 0 24px;
+      background: #0f172a;
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+    .diagram img {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+    .diagram figcaption {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Speaker note — mentor will explain */
+    .speaker-note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: #f5f3ff;
+      border: 1px solid #ddd6fe;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .speaker-note .icon {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #7c3aed;
+      color: white;
+      display: grid; place-items: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .speaker-note strong { color: #5b21b6; }
+
+    /* Meta strip on intro */
+    .meta-strip {
+      display: flex;
+      gap: 24px;
+      padding: 16px 20px;
+      background: #f8fafc;
+      border-radius: var(--radius);
+      margin: 20px 0 28px;
+      font-size: 14px;
+    }
+    .meta-strip > div { color: var(--text-soft); }
+    .meta-strip strong { color: var(--text); display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+
+    /* Responsive */
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; gap: 24px; padding: 24px 16px 60px; }
+      .sidebar { position: static; }
+      .step { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-mark">A</div>
+    <div class="topbar-title">ADK Orchestra — A Beginner's Workshop</div>
+    <div class="topbar-meta">~60 minutes · Python</div>
+  </header>
+
+  <div class="layout">
+    <!-- ── SIDEBAR ──────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-label">Workshop</div>
+      <ul class="nav-list" id="nav">
+        <li class="nav-item active" data-step="1"><span class="nav-num">1</span> Introduction</li>
+        <li class="nav-item" data-step="2"><span class="nav-num">2</span> Getting set up</li>
+        <li class="nav-item" data-step="3"><span class="nav-num">3</span> Prerequisites</li>
+        <li class="nav-item" data-step="4"><span class="nav-num">4</span> Your first agent</li>
+        <li class="nav-item" data-step="5"><span class="nav-num">5</span> Sequential pipeline</li>
+        <li class="nav-item" data-step="6"><span class="nav-num">6</span> Parallel research</li>
+        <li class="nav-item" data-step="7"><span class="nav-num">7</span> Loop refinement</li>
+        <li class="nav-item" data-step="8"><span class="nav-num">8</span> MCP tool exercise</li>
+        <li class="nav-item" data-step="9"><span class="nav-num">9</span> The full orchestra</li>
+        <li class="nav-item" data-step="10"><span class="nav-num">10</span> Vibe-code with Gemini CLI</li>
+        <li class="nav-item" data-step="11"><span class="nav-num">11</span> Next steps</li>
+      </ul>
+    </aside>
+
+    <!-- ── CONTENT ──────────────────────────────────────── -->
+    <main class="content">
+
+      <!-- ───────── STEP 1 ───────── -->
+      <section class="step visible" data-step="1">
+        <span class="badge">Workshop · Beginner</span>
+        <h1>Build agents with Google ADK</h1>
+        <p class="lead">A friendly, hands-on workshop. You will build five small agents — from a single helper to a full multi-agent pipeline.</p>
+
+        <div class="meta-strip">
+          <div><strong>Duration</strong>~60 min</div>
+          <div><strong>Level</strong>Beginner</div>
+          <div><strong>Language</strong>Python 3.10+</div>
+          <div><strong>Cost</strong>Free tier OK</div>
+        </div>
+
+        <h2>What is ADK?</h2>
+        <p><strong>ADK</strong> (Agent Development Kit) is Google's open-source toolkit for building AI agents. An agent is a program that uses an LLM (like Gemini) to decide what to do — call tools, run code, chain steps — instead of you hard-coding every branch.</p>
+        <p>ADK gives you a few small building blocks. You compose them into anything from a single helper to an orchestra of agents working together.</p>
+
+        <h2>What you will build</h2>
+        <ol>
+          <li><strong>A soloist</strong> — one agent with one custom tool (a weather lookup).</li>
+          <li><strong>An assembly line</strong> — three agents in a row: write code → review → refactor.</li>
+          <li><strong>A research team</strong> — three agents working in parallel, then a synthesizer.</li>
+          <li><strong>A loop</strong> — a writer and a critic iterating until the work is good.</li>
+          <li><strong>An MCP agent</strong> — an agent that talks to an external server using Model Context Protocol.</li>
+          <li><strong>The full orchestra</strong> — all of the above composed into one pipeline.</li>
+        </ol>
+
+        <h2>What you will learn</h2>
+        <ul>
+          <li>How to define an agent and give it tools</li>
+          <li>How agents pass data through <strong>session state</strong></li>
+          <li>The three workflow primitives: <code>SequentialAgent</code>, <code>ParallelAgent</code>, <code>LoopAgent</code></li>
+          <li>How to plug in external capabilities via <strong>MCP</strong></li>
+        </ul>
+
+        <div class="callout note">
+          <div class="callout-title">No prior agent experience needed</div>
+          <p>If you can read Python and run a terminal command, you can do this workshop. We start very simple.</p>
+        </div>
+
+        <div class="step-footer">
+          <span></span>
+          <button class="btn primary" data-next>Get started →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 2 ───────── -->
+      <section class="step" data-step="2">
+        <h1>Getting set up</h1>
+        <p class="lead">Five minutes of setup, then on to the fun part.</p>
+
+        <h2>What you need</h2>
+        <ul>
+          <li>A computer running macOS, Linux, or Windows (WSL recommended)</li>
+          <li><strong>Python 3.10 or newer</strong></li>
+          <li>A terminal you are comfortable in</li>
+          <li>A code editor (VS Code, Cursor, anything you like)</li>
+          <li>A free <strong>Google AI Studio API key</strong> — we'll get this in the next step</li>
+        </ul>
+
+        <h2>The project</h2>
+        <p>You'll work inside the <code>adk-orchestra/</code> folder. The agents are organized like this:</p>
+
+        <pre><code><span class="tok-c">adk-orchestra/</span>
+├── single_agent/          <span class="tok-c"># Step 4 — the soloist</span>
+├── sequential_pipeline/   <span class="tok-c"># Step 5 — the assembly line</span>
+├── parallel_research/     <span class="tok-c"># Step 6 — fan-out research</span>
+├── loop_refinement/       <span class="tok-c"># Step 7 — writer vs. critic</span>
+├── content_orchestra/     <span class="tok-c"># Step 9 — the full pipeline</span>
+├── setup.sh               <span class="tok-c"># One-shot setup script</span>
+├── requirements.txt       <span class="tok-c"># Python dependencies</span>
+└── .env.example           <span class="tok-c"># Template for your API key</span></code></pre>
+
+        <p>Each folder is one agent. Each <code>agent.py</code> defines a <code>root_agent</code> object — that's the entry point ADK looks for.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">How the workshop works</div>
+          <p>Each <code>agent.py</code> ships with the real code <strong>commented out</strong>. At each step you'll <strong>uncomment</strong> the block (remove the <code>#&nbsp;</code> from every line) to bring the agent to life. Until you do, that agent shows up as a placeholder in the ADK UI that just says "I'm not built yet."</p>
+          <p>In VS Code: select the block and press <strong>Cmd-/</strong> (Mac) or <strong>Ctrl-/</strong> (Win/Linux) to toggle comments on a whole selection.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>Install prerequisites →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 3 ───────── -->
+      <section class="step" data-step="3">
+        <h1>Prerequisites (Installation)</h1>
+        <p class="lead">A few quick installs, then you're done with setup forever.</p>
+
+        <h2>1. Get a Google AI API key</h2>
+        <ol>
+          <li>Go to <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a></li>
+          <li>Sign in with a Google account</li>
+          <li>Click <strong>Create API key</strong> and copy the value</li>
+        </ol>
+
+        <div class="callout note">
+          <div class="callout-title">Note</div>
+          <p>The free tier is plenty for this workshop. No credit card needed.</p>
+        </div>
+
+        <h3>How the pieces fit together</h3>
+        <figure class="diagram">
+          <img src="images/gcp-billing-concept.png" alt="Diagram: Billing Account → Google Cloud Project → API Key → Your Application" />
+          <figcaption>Billing Account → Cloud Project → API Key → Your App</figcaption>
+        </figure>
+        <p>Four layers, in plain English:</p>
+        <ol>
+          <li><strong>Billing account</strong> — where charges land. You can have one or many.</li>
+          <li><strong>Cloud project</strong> — a container for your work. Linked to a billing account.</li>
+          <li><strong>API key</strong> — issued inside a project. This is what your app sends with each request.</li>
+          <li><strong>Your application</strong> — uses the key to call Gemini.</li>
+        </ol>
+        <div class="speaker-note">
+          <span class="icon">!</span>
+          <div><strong>Your mentor will walk through this live</strong> — when to use AI Studio vs. Vertex AI, how billing works in production, and what to watch out for. The diagram is just a quick mental model for now.</div>
+        </div>
+
+        <h2>2. Run the setup script</h2>
+        <p>From your terminal, in the <code>adk-orchestra-workshop/</code> directory:</p>
+
+        <pre><code><span class="tok-f">./setup.sh</span></code></pre>
+
+        <p>The script does four things:</p>
+        <ul>
+          <li>Creates a Python virtual environment in <code>.venv/</code></li>
+          <li>Installs ADK and its Python dependencies</li>
+          <li>Creates your <code>.env</code> file from the template</li>
+          <li>Asks if you want to install <strong>Gemini CLI</strong> (for the bonus step) — say yes if you have <code>npm</code></li>
+        </ul>
+
+        <div class="callout note">
+          <div class="callout-title">About Gemini CLI</div>
+          <p>Gemini CLI is Google's command-line coding assistant — like Claude Code or Cursor, but in your terminal. We use it in the bonus step to scaffold a frontend and FastAPI backend on top of your agents. Optional, but fun. Requires Node.js.</p>
+        </div>
+
+        <h2>3. Add your API key</h2>
+        <p>Open <code>.env</code> and paste your key:</p>
+
+        <pre><code><span class="tok-c"># .env</span>
+GOOGLE_API_KEY=<span class="tok-s">"paste-your-key-here"</span></code></pre>
+
+        <h2>4. Activate the environment</h2>
+        <pre><code><span class="tok-f">source</span> .venv/bin/activate</code></pre>
+        <p>On Windows: <code>.venv\Scripts\activate</code></p>
+
+        <h2>5. Start the ADK web UI</h2>
+        <pre><code><span class="tok-f">adk</span> web</code></pre>
+
+        <p>Open the URL it prints (usually <code>http://localhost:8000</code>). You should see a dropdown listing the five agents. Pick any one and try chatting with it. If that works — you're ready.</p>
+
+        <h2>6. (Optional) Verify Gemini CLI</h2>
+        <p>If you installed it above, check it's working:</p>
+        <pre><code><span class="tok-f">gemini</span> --version
+<span class="tok-c"># or just run:</span>
+<span class="tok-f">gemini</span></code></pre>
+        <p>The first run will ask you to authenticate. Sign in with the same Google account you used for the API key.</p>
+
+        <div class="callout warn">
+          <div class="callout-title">Stuck?</div>
+          <p><strong><code>adk: command not found</code></strong> — your venv isn't active. Re-run <code>source .venv/bin/activate</code>.</p>
+          <p><strong>401 error</strong> — your API key is wrong or missing from <code>.env</code>.</p>
+          <p><strong><code>gemini: command not found</code></strong> — re-run <code>./setup.sh</code> and say <strong>Y</strong> at the Gemini CLI prompt, or install manually: <code>npm install -g @google/gemini-cli</code></p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>Build your first agent →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 4 ───────── -->
+      <section class="step" data-step="4">
+        <span class="badge">Step 1 · The Soloist</span>
+        <h1>Your first agent: <code>single_agent</code></h1>
+        <p class="lead">One agent, one tool. The smallest unit of ADK.</p>
+
+        <h2>The idea</h2>
+        <p>We'll make a weather assistant. The agent itself can't fetch weather — but we give it a <strong>tool</strong> (a regular Python function), and ADK lets the LLM call that function when it makes sense.</p>
+
+        <h2>The code</h2>
+        <p>Open <code>single_agent/agent.py</code>. You'll see the code below — but <strong>commented out</strong>. Uncomment the whole block (select all lines starting with <code>#&nbsp;</code> below the marker, then <strong>Cmd-/</strong> or <strong>Ctrl-/</strong>) and save.</p>
+
+        <pre><code><span class="tok-k">from</span> google.adk.agents <span class="tok-k">import</span> LlmAgent
+
+MODEL = <span class="tok-s">"gemini-flash-latest"</span>
+
+
+<span class="tok-k">def</span> <span class="tok-f">get_weather</span>(city: <span class="tok-t">str</span>) -> <span class="tok-t">dict</span>:
+    <span class="tok-s">"""Retrieves the current weather for a city.
+
+    Args:
+        city: The city name to look up.
+
+    Returns:
+        dict: status and result or error message.
+    """</span>
+    data = {
+        <span class="tok-s">"stockholm"</span>: <span class="tok-s">"Sunny, 22°C"</span>,
+        <span class="tok-s">"tokyo"</span>: <span class="tok-s">"Rainy, 20°C"</span>,
+        <span class="tok-s">"paris"</span>: <span class="tok-s">"Sunny, 21°C"</span>,
+    }
+    report = data.get(city.lower())
+    <span class="tok-k">if</span> report:
+        <span class="tok-k">return</span> {<span class="tok-s">"status"</span>: <span class="tok-s">"success"</span>, <span class="tok-s">"report"</span>: report}
+    <span class="tok-k">return</span> {<span class="tok-s">"status"</span>: <span class="tok-s">"error"</span>, <span class="tok-s">"error_message"</span>: <span class="tok-s">f"No data for '{city}'."</span>}
+
+
+root_agent = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"SingleAgent"</span>,
+    model=MODEL,
+    description=<span class="tok-s">"A weather assistant."</span>,
+    instruction=(
+        <span class="tok-s">"You help users check the weather. "</span>
+        <span class="tok-s">"Always use the get_weather tool to look up conditions."</span>
+    ),
+    tools=[get_weather],
+)</code></pre>
+
+        <h2>What's happening</h2>
+        <ul>
+          <li><code>LlmAgent</code> — the agent class. Needs a name, model, and instruction.</li>
+          <li><code>tools=[get_weather]</code> — we pass the function in. ADK reads the <strong>docstring</strong> to teach the LLM what the tool does.</li>
+          <li><code>root_agent</code> — the magic variable name ADK looks for. Every agent folder must have one.</li>
+        </ul>
+
+        <div class="callout tip">
+          <div class="callout-title">Why docstrings matter</div>
+          <p>The LLM only knows what your tool does by reading its docstring. A vague docstring → the model misuses the tool. Write them clearly.</p>
+        </div>
+
+        <h2>Try it</h2>
+        <ol>
+          <li>In the ADK web UI, pick <strong>single_agent</strong> from the dropdown.</li>
+          <li>Type: <em>What's the weather in Stockholm?</em></li>
+          <li>Now try: <em>What's the weather on Mars?</em></li>
+        </ol>
+
+        <p>Watch the <strong>Events</strong> tab. You can see the moment the model decides to call <code>get_weather</code>, the arguments it sends, and the result.</p>
+
+        <div class="exercise">
+          <span class="exercise-tag">Try it yourself</span>
+          <h3>Add your city</h3>
+          <p>Add an entry to the <code>data</code> dict for your home city. Restart <code>adk web</code> and ask about it. Then add a second tool — maybe <code>get_population(city)</code> — and watch the agent pick the right one based on the question.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>Chain agents →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 5 ───────── -->
+      <section class="step" data-step="5">
+        <span class="badge">Step 2 · The Assembly Line</span>
+        <h1>Chain agents: <code>sequential_pipeline</code></h1>
+        <p class="lead">Three agents in a row. The output of each becomes input for the next.</p>
+
+        <div class="flow">
+          <div class="flow-node">CodeWriter</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">CodeReviewer</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">CodeRefactorer</div>
+        </div>
+
+        <h2>The big idea: session state</h2>
+        <p>Agents pass data through a shared dictionary called <strong>session state</strong>. Two pieces wire it up:</p>
+
+        <table>
+          <thead><tr><th>Pattern</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>output_key="x"</code></td><td>Saves this agent's reply into <code>state["x"]</code></td></tr>
+            <tr><td><code>{x}</code> in instruction</td><td>Reads <code>state["x"]</code> at runtime</td></tr>
+          </tbody>
+        </table>
+
+        <h2>The code</h2>
+        <p>Open <code>sequential_pipeline/agent.py</code> and uncomment the block below the marker. Code (what you'll get once uncommented):</p>
+
+        <pre><code>writer = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"CodeWriter"</span>,
+    model=MODEL,
+    instruction=<span class="tok-s">"Write a clean Python implementation. Output only code."</span>,
+    output_key=<span class="tok-s">"generated_code"</span>,   <span class="tok-c"># ← writes here</span>
+)
+
+reviewer = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"CodeReviewer"</span>,
+    model=MODEL,
+    instruction=(
+        <span class="tok-s">"Review this Python code:\n"</span>
+        <span class="tok-s">"```python\n{generated_code}\n```\n\n"</span>   <span class="tok-c"># ← reads here</span>
+        <span class="tok-s">"List bugs and quality issues."</span>
+    ),
+    output_key=<span class="tok-s">"review_comments"</span>,
+)
+
+refactorer = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"CodeRefactorer"</span>,
+    model=MODEL,
+    instruction=(
+        <span class="tok-s">"Refactor this code:\n{generated_code}\n\n"</span>
+        <span class="tok-s">"Apply this feedback:\n{review_comments}"</span>
+    ),
+    output_key=<span class="tok-s">"refactored_code"</span>,
+)
+
+root_agent = <span class="tok-f">SequentialAgent</span>(
+    name=<span class="tok-s">"CodePipeline"</span>,
+    sub_agents=[writer, reviewer, refactorer],
+)</code></pre>
+
+        <h2>Try it</h2>
+        <ol>
+          <li>Pick <strong>sequential_pipeline</strong> in the UI.</li>
+          <li>Ask: <em>Write a function that checks if a number is prime.</em></li>
+          <li>Open the <strong>State</strong> tab on the right.</li>
+          <li>Watch <code>generated_code</code>, then <code>review_comments</code>, then <code>refactored_code</code> fill in — one by one.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Why this is powerful</div>
+          <p>Each agent has one job. Writing the prompt is easier. Debugging is easier. And you can swap any step out without touching the others.</p>
+        </div>
+
+        <div class="exercise">
+          <span class="exercise-tag">Try it yourself</span>
+          <h3>Add a fourth step</h3>
+          <p>Add a <code>DocWriter</code> agent that reads <code>refactored_code</code> and writes a one-paragraph explanation of what the function does. Save its output to <code>state["explanation"]</code>. Add it to <code>sub_agents</code>. Restart and test.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>Run agents in parallel →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 6 ───────── -->
+      <section class="step" data-step="6">
+        <span class="badge">Step 3 · Fan-Out, Gather</span>
+        <h1>Parallel agents: <code>parallel_research</code></h1>
+        <p class="lead">Three researchers run at the same time. A synthesizer combines their answers.</p>
+
+        <div class="flow">
+          <div class="flow-node">Renewables</div>
+          <div class="flow-node">EVs</div>
+          <div class="flow-node">Carbon capture</div>
+          <span class="flow-arrow">⇒</span>
+          <div class="flow-node">Synthesizer</div>
+        </div>
+
+        <h2>Why parallel?</h2>
+        <p>If three lookups don't depend on each other, running them in parallel is dramatically faster than running them in sequence. <code>ParallelAgent</code> kicks them all off, waits for all to finish, then moves on.</p>
+
+        <h2>The code (shortened)</h2>
+        <p>Open <code>parallel_research/agent.py</code> and uncomment the full block below the marker. The shortened version below shows the shape:</p>
+        <pre><code><span class="tok-k">from</span> google.adk.agents <span class="tok-k">import</span> LlmAgent, ParallelAgent, SequentialAgent
+<span class="tok-k">from</span> google.adk.tools <span class="tok-k">import</span> google_search
+
+renewable = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"RenewableResearcher"</span>, model=MODEL,
+    instruction=<span class="tok-s">"Research recent renewable energy developments."</span>,
+    tools=[google_search],
+    output_key=<span class="tok-s">"renewable_result"</span>,   <span class="tok-c"># ← UNIQUE key</span>
+)
+ev = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"EVResearcher"</span>, model=MODEL,
+    instruction=<span class="tok-s">"Research EV technology advances."</span>,
+    tools=[google_search],
+    output_key=<span class="tok-s">"ev_result"</span>,
+)
+carbon = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"CarbonResearcher"</span>, model=MODEL,
+    instruction=<span class="tok-s">"Research carbon capture methods."</span>,
+    tools=[google_search],
+    output_key=<span class="tok-s">"carbon_result"</span>,
+)
+
+team = <span class="tok-f">ParallelAgent</span>(name=<span class="tok-s">"ResearchTeam"</span>, sub_agents=[renewable, ev, carbon])
+
+synthesizer = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"Synthesizer"</span>, model=MODEL,
+    instruction=(
+        <span class="tok-s">"Combine into one report:\n"</span>
+        <span class="tok-s">"Renewable: {renewable_result}\n"</span>
+        <span class="tok-s">"EVs: {ev_result}\n"</span>
+        <span class="tok-s">"Carbon: {carbon_result}"</span>
+    ),
+)
+
+<span class="tok-c"># Run team in parallel, THEN run synthesizer:</span>
+root_agent = <span class="tok-f">SequentialAgent</span>(
+    name=<span class="tok-s">"ResearchAndSynthesize"</span>,
+    sub_agents=[team, synthesizer],
+)</code></pre>
+
+        <h2>Two rules you must know</h2>
+        <div class="callout warn">
+          <div class="callout-title">Rule 1 · Unique output keys</div>
+          <p>If two parallel agents use the same <code>output_key</code>, they will silently overwrite each other. Whoever finishes last wins. Always give each branch a <strong>different</strong> key.</p>
+        </div>
+        <div class="callout warn">
+          <div class="callout-title">Rule 2 · <code>google_search</code> is solo</div>
+          <p>An agent that uses <code>google_search</code> can't have any other tools. It's a Gemini built-in grounding tool, not a regular function call. Just describe the research task — grounding activates automatically.</p>
+        </div>
+
+        <h2>Try it</h2>
+        <ol>
+          <li>Pick <strong>parallel_research</strong>.</li>
+          <li>Ask: <em>Research the future of renewable energy.</em></li>
+          <li>Open the <strong>Events</strong> tab. You'll see events from all three researchers interleaving — that's parallelism live.</li>
+        </ol>
+
+        <div class="exercise">
+          <span class="exercise-tag">Try it yourself</span>
+          <h3>Pick your own topic</h3>
+          <p>Change the three researchers to investigate something you care about (recipe ideas, travel destinations, programming languages). Remember to update the synthesizer's instruction to use the new <code>output_key</code> names.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>Build a feedback loop →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 7 ───────── -->
+      <section class="step" data-step="7">
+        <span class="badge">Step 4 · Iteration</span>
+        <h1>Loop until good: <code>loop_refinement</code></h1>
+        <p class="lead">A writer drafts. A critic reviews. They repeat until the critic says "ship it."</p>
+
+        <div class="flow">
+          <div class="flow-node">Writer</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">Critic</div>
+          <span class="flow-arrow">↺</span>
+          <div class="flow-node" style="background:#fef3c7">exit_loop?</div>
+        </div>
+
+        <h2>How the loop exits</h2>
+        <p>An <code>LoopAgent</code> needs a way to stop. We give the critic a special tool, <code>exit_loop</code>, that flips a flag on the agent's context. ADK sees the flag and breaks out of the loop.</p>
+
+        <h2>The code</h2>
+        <p>Open <code>loop_refinement/agent.py</code> and uncomment the full block below the marker:</p>
+        <pre><code><span class="tok-k">from</span> google.adk.agents <span class="tok-k">import</span> LlmAgent, LoopAgent
+<span class="tok-k">from</span> google.adk.tools.tool_context <span class="tok-k">import</span> ToolContext
+
+
+<span class="tok-k">def</span> <span class="tok-f">exit_loop</span>(tool_context: ToolContext) -> <span class="tok-t">dict</span>:
+    <span class="tok-s">"""Call this tool ONLY when the document is publish-ready."""</span>
+    tool_context.actions.escalate = <span class="tok-k">True</span>   <span class="tok-c"># breaks the loop</span>
+    <span class="tok-k">return</span> {}
+
+
+writer = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"Writer"</span>, model=MODEL,
+    instruction=(
+        <span class="tok-s">"Current document:\n{current_doc?}\n\n"</span>   <span class="tok-c"># ← '?' = optional</span>
+        <span class="tok-s">"Critic feedback:\n{critique?}\n\n"</span>
+        <span class="tok-s">"If first pass, write a draft. If critique, revise."</span>
+    ),
+    output_key=<span class="tok-s">"current_doc"</span>,
+)
+
+critic = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"Critic"</span>, model=MODEL,
+    instruction=(
+        <span class="tok-s">"Review:\n{current_doc}\n\n"</span>
+        <span class="tok-s">"If publish-ready, call exit_loop. "</span>
+        <span class="tok-s">"Otherwise list 2-3 specific improvements."</span>
+    ),
+    tools=[exit_loop],
+    output_key=<span class="tok-s">"critique"</span>,
+)
+
+root_agent = <span class="tok-f">LoopAgent</span>(
+    name=<span class="tok-s">"RefinementLoop"</span>,
+    max_iterations=<span class="tok-n">5</span>,            <span class="tok-c"># ← safety net</span>
+    sub_agents=[writer, critic],
+)</code></pre>
+
+        <h2>Two patterns worth remembering</h2>
+        <ul>
+          <li><strong><code>{key?}</code></strong> — the question mark means "optional." On the first loop pass, <code>current_doc</code> and <code>critique</code> don't exist yet. The <code>?</code> tells ADK to substitute an empty string instead of crashing.</li>
+          <li><strong><code>max_iterations</code></strong> — non-negotiable. Without it, a stubborn critic can loop forever, racking up API costs. Always set a ceiling.</li>
+        </ul>
+
+        <div class="callout warn">
+          <div class="callout-title">Wallet warning</div>
+          <p>Loops can be expensive. Each iteration is two LLM calls. Start with <code>max_iterations=3</code> while developing — bump it up only when you trust the exit logic.</p>
+        </div>
+
+        <h2>Try it</h2>
+        <ol>
+          <li>Pick <strong>loop_refinement</strong>.</li>
+          <li>Ask: <em>Write a short blog post about why Python is great for beginners.</em></li>
+          <li>Open the <strong>State</strong> tab. Watch <code>current_doc</code> and <code>critique</code> change on each pass. The loop stops when the critic calls <code>exit_loop</code>.</li>
+        </ol>
+
+        <div class="exercise">
+          <span class="exercise-tag">Try it yourself</span>
+          <h3>Tougher critic</h3>
+          <p>Edit the critic's instruction to be much pickier — e.g. "Demand specific examples, vivid verbs, and zero passive voice." See how many iterations it takes now. Did it hit <code>max_iterations=5</code> without exiting? Bump it to 8 and try again.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>MCP exercise →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 8 — MCP EXERCISE ───────── -->
+      <section class="step" data-step="8">
+        <span class="badge">Step 5 · Hands-On Exercise</span>
+        <h1>Connect to an MCP server</h1>
+        <p class="lead">So far, every tool has been a local Python function. Now we'll connect to an external tool server using the <strong>Model Context Protocol</strong>.</p>
+
+        <h2>What is MCP?</h2>
+        <p><strong>Model Context Protocol</strong> is an open standard for connecting LLMs to external tools and data sources. Think of it like USB-C for AI: any MCP-compatible client (ADK, Claude, Cursor) can plug into any MCP-compatible server (file systems, GitHub, Airbnb search, your own).</p>
+        <p>The win: you don't have to re-write the integration for every framework. Build the server once, plug it in everywhere.</p>
+
+        <div class="callout note">
+          <div class="callout-title">For this exercise</div>
+          <p>We'll connect to the public <strong>Airbnb MCP server</strong> — it lets your agent search real listings. Runs locally via <code>npx</code>, no signup needed.</p>
+        </div>
+
+        <h2>Step 1 — install Node.js (if you don't have it)</h2>
+        <p>Check if you already have it:</p>
+        <pre><code><span class="tok-f">node</span> --version
+<span class="tok-f">npx</span> --version</code></pre>
+        <p>If either errors out, install Node from <a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a> (LTS version is fine).</p>
+
+        <h2>Step 2 — create a new agent folder</h2>
+        <p>From the <code>adk-orchestra/</code> root:</p>
+        <pre><code><span class="tok-f">mkdir</span> mcp_travel
+<span class="tok-f">touch</span> mcp_travel/__init__.py mcp_travel/agent.py</code></pre>
+
+        <p>Now open <code>mcp_travel/__init__.py</code> and add one line so ADK picks it up:</p>
+        <pre><code><span class="tok-k">from</span> .agent <span class="tok-k">import</span> root_agent</code></pre>
+
+        <h2>Step 3 — write the agent</h2>
+        <p>Open <code>mcp_travel/agent.py</code> and paste:</p>
+
+        <pre><code><span class="tok-s">"""
+MCP demo — agent that uses an external Airbnb search server.
+"""</span>
+<span class="tok-k">from</span> google.adk.agents <span class="tok-k">import</span> LlmAgent
+<span class="tok-k">from</span> google.adk.tools.mcp_tool.mcp_toolset <span class="tok-k">import</span> MCPToolset
+<span class="tok-k">from</span> google.adk.tools.mcp_tool.mcp_session_manager <span class="tok-k">import</span> StdioConnectionParams
+<span class="tok-k">from</span> mcp <span class="tok-k">import</span> StdioServerParameters
+
+MODEL = <span class="tok-s">"gemini-flash-latest"</span>
+
+<span class="tok-c"># Configure the Airbnb MCP server (runs locally via npx)</span>
+airbnb_mcp = <span class="tok-f">MCPToolset</span>(
+    connection_params=<span class="tok-f">StdioConnectionParams</span>(
+        server_params=<span class="tok-f">StdioServerParameters</span>(
+            command=<span class="tok-s">"npx"</span>,
+            args=[<span class="tok-s">"-y"</span>, <span class="tok-s">"@openbnb/mcp-server-airbnb"</span>, <span class="tok-s">"--ignore-robots-txt"</span>],
+        ),
+        timeout=<span class="tok-n">30</span>,   <span class="tok-c"># seconds — Airbnb can be slow</span>
+    ),
+)
+
+root_agent = <span class="tok-f">LlmAgent</span>(
+    name=<span class="tok-s">"MCPTravel"</span>,
+    model=MODEL,
+    description=<span class="tok-s">"Finds Airbnb listings using a real MCP server."</span>,
+    instruction=(
+        <span class="tok-s">"You are a friendly travel assistant. "</span>
+        <span class="tok-s">"Use the Airbnb tools to search listings when the user asks. "</span>
+        <span class="tok-s">"Present results as a clean markdown list with name, price, and rating."</span>
+    ),
+    tools=[airbnb_mcp],
+)</code></pre>
+
+        <h2>Step 4 — run it</h2>
+        <p>Restart the ADK web UI:</p>
+        <pre><code><span class="tok-c"># Ctrl-C to stop, then:</span>
+<span class="tok-f">adk</span> web</code></pre>
+        <p>Pick <strong>mcp_travel</strong> from the dropdown. Try:</p>
+        <ul>
+          <li><em>Find me 3 Airbnbs in Lisbon under $100/night</em></li>
+          <li><em>Show me places in Paris near the Louvre</em></li>
+        </ul>
+
+        <h2>What's happening behind the scenes</h2>
+        <ol>
+          <li>ADK starts the MCP server as a subprocess (the <code>npx</code> command).</li>
+          <li>It asks the server "what tools do you have?" — the server replies with a list (e.g. <code>airbnb_search</code>, <code>airbnb_listing_details</code>).</li>
+          <li>Those tools get added to your agent's toolset automatically.</li>
+          <li>When the LLM decides to call one, ADK forwards the call to the server over stdio, gets the result, and feeds it back to the model.</li>
+        </ol>
+
+        <div class="callout warn">
+          <div class="callout-title">Common errors</div>
+          <p><strong>Timeout:</strong> bump <code>timeout=30</code> higher (try 60).</p>
+          <p><strong>robots.txt error:</strong> ensure <code>--ignore-robots-txt</code> is in the args (it is, above).</p>
+          <p><strong>npx not found:</strong> install Node.js, then restart your terminal.</p>
+        </div>
+
+        <div class="exercise">
+          <span class="exercise-tag">Bonus exercise</span>
+          <h3>Add a second MCP server</h3>
+          <p>The <a href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">official MCP server registry</a> has dozens of public servers — filesystem, fetch, sqlite, GitHub, time, weather, and more.</p>
+          <p>Add the <strong>time</strong> server alongside Airbnb so your agent can answer "What time is it in Tokyo when checkout is 11am local?" Just create a second <code>MCPToolset</code> and put both in <code>tools=[airbnb_mcp, time_mcp]</code>.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>The full orchestra →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 9 ───────── -->
+      <section class="step" data-step="9">
+        <span class="badge">Step 6 · Composition</span>
+        <h1>Put it all together: <code>content_orchestra</code></h1>
+        <p class="lead">Now we compose everything you've learned into one pipeline that produces a polished article from a single topic.</p>
+
+        <h2>The architecture</h2>
+        <pre><code><span class="tok-c">SequentialAgent (root)</span>
+├── 1. ResearchTeam       <span class="tok-c"># Sequential — trends, audience, competitors</span>
+├── 2. Outliner           <span class="tok-c"># Reads research, builds outline</span>
+├── 3. Drafter            <span class="tok-c"># Reads outline, writes first draft</span>
+└── 4. RefinementLoop     <span class="tok-c"># LoopAgent — Reviser ↔ Critic (max 3)</span></code></pre>
+
+        <p>Three primitives, one pipeline:</p>
+        <ul>
+          <li><code>SequentialAgent</code> wraps the whole thing</li>
+          <li>Each <strong>step</strong> is itself another <code>SequentialAgent</code> or <code>LoopAgent</code></li>
+          <li>Data flows through session state — exactly the same keys you've seen before</li>
+        </ul>
+
+        <h2>The trick: nest workflow agents</h2>
+        <p>The "magic" here isn't magic at all. <code>SequentialAgent</code>, <code>ParallelAgent</code>, and <code>LoopAgent</code> are all just agents. So you can put them inside each other:</p>
+
+        <pre><code>root_agent = <span class="tok-f">SequentialAgent</span>(
+    name=<span class="tok-s">"ContentOrchestra"</span>,
+    sub_agents=[
+        research_team,       <span class="tok-c"># a SequentialAgent</span>
+        outliner,            <span class="tok-c"># an LlmAgent</span>
+        drafter,             <span class="tok-c"># an LlmAgent</span>
+        refinement_loop,     <span class="tok-c"># a LoopAgent</span>
+    ],
+)</code></pre>
+
+        <p>Open <code>content_orchestra/agent.py</code> and uncomment the full block below the marker. Read it top to bottom — everything in there should now look familiar. It's just the previous four steps stitched together.</p>
+
+        <h2>Try it</h2>
+        <ol>
+          <li>Pick <strong>content_orchestra</strong>.</li>
+          <li>Ask: <em>AI developer tools in 2026</em></li>
+          <li>Open the <strong>State</strong> tab and watch all the keys fill in order: <code>trends</code> → <code>audience</code> → <code>competitors</code> → <code>outline</code> → <code>draft</code> → <code>critique</code> → <code>draft</code> (revised) …</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">This is the takeaway</div>
+          <p>Every multi-agent system you'll build is some combination of these three primitives plus state. That's it. You now have the full toolkit.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>Vibe-code with Gemini CLI →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 10 — GEMINI CLI BONUS ───────── -->
+      <section class="step" data-step="10">
+        <span class="badge">Step 7 · Bonus · Vibe-Coding</span>
+        <h1>Build a UI &amp; backend with Gemini CLI</h1>
+        <p class="lead">You have agents. Now wrap them in a web app — without writing the boilerplate yourself. Gemini CLI does the typing.</p>
+
+        <h2>What is Gemini CLI?</h2>
+        <p><strong>Gemini CLI</strong> is Google's open-source command-line coding assistant. You point it at a folder, type what you want in plain English, and it reads/writes files, runs commands, and edits code. Think of it as a pair programmer that lives in your terminal.</p>
+        <p>For this bonus step we'll use it to scaffold:</p>
+        <ul>
+          <li>A <strong>FastAPI backend</strong> that exposes your ADK agents over HTTP</li>
+          <li>A <strong>simple HTML/JS frontend</strong> that talks to that backend</li>
+        </ul>
+
+        <div class="callout note">
+          <div class="callout-title">Why both ADK and Gemini CLI?</div>
+          <p>ADK is the <em>runtime</em> — it runs your agents. Gemini CLI is the <em>builder</em> — it writes the code around them. ADK is what your app uses in production. Gemini CLI is the assistant you use while developing.</p>
+        </div>
+
+        <h2>Step 1 — Start Gemini CLI</h2>
+        <p>From the workshop folder:</p>
+        <pre><code><span class="tok-f">cd</span> path-to-project/adk-orchestra-workshop
+<span class="tok-f">gemini</span></code></pre>
+        <p>The first time you run it, Gemini CLI asks you to sign in. Use the same Google account as your API key. After that, you're inside an interactive session.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">Tip — let it see your code</div>
+          <p>Run Gemini CLI from the project root so it has read access to all the agent folders. It will read <code>single_agent/agent.py</code>, <code>content_orchestra/agent.py</code>, etc., to understand how your agents work.</p>
+        </div>
+
+        <h2>Step 2 — Ask it to build a FastAPI backend</h2>
+        <p>Paste this prompt into Gemini CLI:</p>
+
+        <pre><code><span class="tok-c"># Prompt to paste:</span>
+Build a FastAPI backend in a new file called <span class="tok-s">backend/main.py</span>.
+
+Requirements:
+- One POST endpoint: <span class="tok-s">/chat/{agent_name}</span>
+- Accept JSON: <span class="tok-s">{"message": "..."}</span>
+- Load the matching agent from this project (single_agent,
+  sequential_pipeline, parallel_research, loop_refinement,
+  content_orchestra) using ADK's Runner API.
+- Return the agent's final response as JSON: <span class="tok-s">{"reply": "..."}</span>
+- Enable CORS so a local frontend can hit it.
+- Also create <span class="tok-s">backend/requirements.txt</span> with fastapi, uvicorn[standard].
+- Show me how to run it.</code></pre>
+
+        <p>Gemini CLI will:</p>
+        <ol>
+          <li>Read your existing agents to learn their structure</li>
+          <li>Create <code>backend/main.py</code> and <code>backend/requirements.txt</code></li>
+          <li>Tell you the exact <code>uvicorn</code> command to start the server</li>
+        </ol>
+
+        <p>Review the diff it shows. Approve it. Then run the install + start commands it gave you.</p>
+
+        <h2>Step 3 — Ask it to build a frontend</h2>
+        <p>Once the backend is up, prompt Gemini CLI again:</p>
+
+        <pre><code><span class="tok-c"># Prompt to paste:</span>
+Now build a minimal frontend in <span class="tok-s">frontend/index.html</span>:
+
+- Single page, vanilla JS, no framework
+- A dropdown to pick the agent (single_agent, sequential_pipeline,
+  parallel_research, loop_refinement, content_orchestra)
+- A textarea for the user message
+- A Send button that POSTs to <span class="tok-s">http://localhost:8000/chat/{agent}</span>
+- Show the reply below in a styled message bubble
+- Clean, simple design — neutral colors, system font, generous padding</code></pre>
+
+        <p>Open the resulting HTML file in your browser. Pick an agent, send a message — you just built a full-stack agent app.</p>
+
+        <h2>Step 4 — Iterate</h2>
+        <p>This is where vibe-coding shines. Try follow-up prompts like:</p>
+        <ul>
+          <li><em>"Stream the response token-by-token instead of waiting for the full reply."</em></li>
+          <li><em>"Add a sidebar that shows the contents of session state in real time."</em></li>
+          <li><em>"Make it look like Notion."</em></li>
+          <li><em>"Add a button that resets the conversation."</em></li>
+          <li><em>"Deploy this to Cloud Run with a Dockerfile."</em></li>
+        </ul>
+
+        <div class="exercise">
+          <span class="exercise-tag">Exercise · Choose your own adventure</span>
+          <h3>Build something real</h3>
+          <p>Pick one of these mini-projects and build it with Gemini CLI on top of your ADK agents:</p>
+          <ol>
+            <li><strong>Travel planner UI</strong> — wrap the <code>mcp_travel</code> agent in a search interface with date pickers and price filters.</li>
+            <li><strong>Code review dashboard</strong> — paste in a Python snippet, run <code>sequential_pipeline</code>, show the writer/reviewer/refactorer outputs side by side.</li>
+            <li><strong>Research report generator</strong> — give <code>content_orchestra</code> a topic and render the resulting article as styled markdown with a "regenerate section" button.</li>
+          </ol>
+          <p>The whole point: you don't need to know FastAPI or HTML/CSS by heart. You direct, Gemini CLI types. Review carefully, run often, ship.</p>
+        </div>
+
+        <div class="callout warn">
+          <div class="callout-title">Trust but verify</div>
+          <p>Gemini CLI will sometimes write code that doesn't quite work. Always run what it produces and read the diffs. When something breaks, paste the error back in — it'll fix it.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" data-next>What's next →</button>
+        </div>
+      </section>
+
+      <!-- ───────── STEP 11 ───────── -->
+      <section class="step" data-step="11">
+        <span class="badge">You did it</span>
+        <h1>Next steps</h1>
+        <p class="lead">You've built five agents and learned every workflow primitive ADK offers. Here's where to go from here.</p>
+
+        <h2>Keep building</h2>
+        <ul>
+          <li><strong>Replace the LLM tools</strong> with real APIs — actual weather, real code execution, your company's internal tools.</li>
+          <li><strong>Add memory.</strong> ADK supports session memory across conversations. Try storing user preferences and recalling them next time.</li>
+          <li><strong>Deploy it.</strong> ADK agents can ship to Cloud Run or anywhere Python runs.</li>
+        </ul>
+
+        <h2>Read more</h2>
+        <table>
+          <thead><tr><th>Resource</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://google.github.io/adk-docs" target="_blank" rel="noopener">Official ADK docs</a></td><td>Full API reference, advanced patterns</td></tr>
+            <tr><td><a href="https://github.com/google/adk-python" target="_blank" rel="noopener">adk-python on GitHub</a></td><td>Source code, issues, examples</td></tr>
+            <tr><td><a href="https://github.com/google/adk-samples" target="_blank" rel="noopener">adk-samples</a></td><td>Production-grade sample agents</td></tr>
+            <tr><td><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">modelcontextprotocol.io</a></td><td>Build your own MCP servers</td></tr>
+          </tbody>
+        </table>
+
+        <h2>One last thing</h2>
+        <p>Agent development is mostly prompt engineering plus plumbing. The plumbing (everything you learned today) is the easy part. The prompts are where the craft lives.</p>
+        <p>So: build something. Ship it. Iterate. The fastest way to get good is to use what you've built and notice where it breaks.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">Good luck</div>
+          <p>If you build something neat, share it. The agent community is small, friendly, and hungry for examples.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn" data-prev>← Back</button>
+          <button class="btn primary" onclick="document.querySelector('[data-step=\'1\']').scrollIntoView();goTo(1)">Back to start ↺</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    const steps = Array.from(document.querySelectorAll('.step'));
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const total = steps.length;
+    let current = 1;
+
+    function goTo(n) {
+      n = Math.max(1, Math.min(total, n));
+      current = n;
+      steps.forEach(s => s.classList.toggle('visible', +s.dataset.step === n));
+      navItems.forEach(li => {
+        const i = +li.dataset.step;
+        li.classList.toggle('active', i === n);
+        li.classList.toggle('done', i < n);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      history.replaceState(null, '', '#step-' + n);
+    }
+
+    navItems.forEach(li => li.addEventListener('click', () => goTo(+li.dataset.step)));
+    document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => goTo(current + 1)));
+    document.querySelectorAll('[data-prev]').forEach(b => b.addEventListener('click', () => goTo(current - 1)));
+
+    // Keyboard nav
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight' || e.key === 'j') goTo(current + 1);
+      if (e.key === 'ArrowLeft'  || e.key === 'k') goTo(current - 1);
+    });
+
+    // Open with hash deep link
+    const hash = location.hash.match(/step-(\d+)/);
+    if (hash) goTo(+hash[1]);
+
+    // Expose for inline onclick
+    window.goTo = goTo;
+  </script>
+</body>
+</html>
