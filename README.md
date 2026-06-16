@@ -1,4 +1,4 @@
-# ADK Orchestra — A Beginner's Workshop
+# Google ADK Agents Orchestra — A Beginner's Workshop
 
 A hands-on, ~90-minute workshop for building AI agents with **Google ADK**.
 
