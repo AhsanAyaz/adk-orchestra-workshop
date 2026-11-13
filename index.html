@@ -463,7 +463,7 @@
       <section class="step visible" data-step="1">
         <span class="badge">Workshop · Beginner</span>
         <h1>Build agents with Google ADK</h1>
-        <p class="lead">A friendly, hands-on workshop. You will build five small agents — from a single helper to a full multi-agent pipeline.</p>
+        <p class="lead">A friendly, hands-on workshop. You will build six small agents — from a single helper to a full multi-agent pipeline.</p>
 
         <div class="meta-strip">
           <div><strong>Duration</strong>~90 min</div>
@@ -917,9 +917,10 @@ root_agent = <span class="tok-f">SequentialAgent</span>(
 
 
 <span class="tok-k">def</span> <span class="tok-f">exit_loop</span>(tool_context: ToolContext) -> <span class="tok-t">dict</span>:
-    <span class="tok-s">"""Call this tool ONLY when the document is publish-ready."""</span>
-    tool_context.actions.escalate = <span class="tok-k">True</span>   <span class="tok-c"># breaks the loop</span>
-    <span class="tok-k">return</span> {}
+    <span class="tok-s">"""Signal that the document is publish-ready and the loop should end."""</span>
+    tool_context.actions.escalate = <span class="tok-k">True</span>             <span class="tok-c"># breaks the loop</span>
+    tool_context.actions.skip_summarization = <span class="tok-k">True</span>   <span class="tok-c"># stop generating after tool call</span>
+    <span class="tok-k">return</span> {<span class="tok-s">"status"</span>: <span class="tok-s">"loop_exited"</span>}
 
 
 writer = <span class="tok-f">LlmAgent</span>(
@@ -1001,7 +1002,7 @@ root_agent = <span class="tok-f">LoopAgent</span>(
         <p>If either errors out, install Node from <a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a> (LTS version is fine).</p>
 
         <h2>Step 2 — create a new agent folder</h2>
-        <p>From the <code>adk-orchestra/</code> root:</p>
+        <p>From the <code>adk-orchestra-workshop/</code> root:</p>
         <pre><code><span class="tok-f">mkdir</span> mcp_travel
 <span class="tok-f">touch</span> mcp_travel/__init__.py mcp_travel/agent.py</code></pre>
 
@@ -1015,14 +1016,13 @@ root_agent = <span class="tok-f">LoopAgent</span>(
 MCP demo — agent that uses an external Airbnb search server.
 """</span>
 <span class="tok-k">from</span> google.adk.agents <span class="tok-k">import</span> LlmAgent
-<span class="tok-k">from</span> google.adk.tools.mcp_tool.mcp_toolset <span class="tok-k">import</span> MCPToolset
-<span class="tok-k">from</span> google.adk.tools.mcp_tool.mcp_session_manager <span class="tok-k">import</span> StdioConnectionParams
+<span class="tok-k">from</span> google.adk.tools.mcp_tool <span class="tok-k">import</span> McpToolset, StdioConnectionParams
 <span class="tok-k">from</span> mcp <span class="tok-k">import</span> StdioServerParameters
 
 MODEL = <span class="tok-s">"gemini-flash-latest"</span>
 
 <span class="tok-c"># Configure the Airbnb MCP server (runs locally via npx)</span>
-airbnb_mcp = <span class="tok-f">MCPToolset</span>(
+airbnb_mcp = <span class="tok-f">McpToolset</span>(
     connection_params=<span class="tok-f">StdioConnectionParams</span>(
         server_params=<span class="tok-f">StdioServerParameters</span>(
             command=<span class="tok-s">"npx"</span>,
@@ -1073,7 +1073,7 @@ root_agent = <span class="tok-f">LlmAgent</span>(
           <span class="exercise-tag">Bonus exercise</span>
           <h3>Add a second MCP server</h3>
           <p>The <a href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">official MCP server registry</a> has dozens of public servers — filesystem, fetch, sqlite, GitHub, time, weather, and more.</p>
-          <p>Add the <strong>time</strong> server alongside Airbnb so your agent can answer "What time is it in Tokyo when checkout is 11am local?" Just create a second <code>MCPToolset</code> and put both in <code>tools=[airbnb_mcp, time_mcp]</code>.</p>
+          <p>Add the <strong>time</strong> server alongside Airbnb so your agent can answer "What time is it in Tokyo when checkout is 11am local?" Just create a second <code>McpToolset</code> and put both in <code>tools=[airbnb_mcp, time_mcp]</code>.</p>
         </div>
 
         <div class="step-footer">
@@ -1094,15 +1094,15 @@ root_agent = <span class="tok-f">LlmAgent</span>(
           <figcaption>Four stages, three primitives, one pipeline.</figcaption>
         </figure>
         <pre><code><span class="tok-c">SequentialAgent (root)</span>
-├── 1. ResearchTeam       <span class="tok-c"># Sequential — trends, audience, competitors</span>
+├── 1. ResearchTeam       <span class="tok-c"># ParallelAgent — trends, audience, competitors</span>
 ├── 2. Outliner           <span class="tok-c"># Reads research, builds outline</span>
 ├── 3. Drafter            <span class="tok-c"># Reads outline, writes first draft</span>
-└── 4. RefinementLoop     <span class="tok-c"># LoopAgent — Reviser ↔ Critic (max 3)</span></code></pre>
+└── 4. RefinementLoop     <span class="tok-c"># LoopAgent — Critic ↔ Reviser (max 3)</span></code></pre>
 
         <p>Three primitives, one pipeline:</p>
         <ul>
           <li><code>SequentialAgent</code> wraps the whole thing</li>
-          <li>Each <strong>step</strong> is itself another <code>SequentialAgent</code> or <code>LoopAgent</code></li>
+          <li>Each <strong>step</strong> can be an <code>LlmAgent</code>, <code>ParallelAgent</code>, or <code>LoopAgent</code></li>
           <li>Data flows through session state — exactly the same keys you've seen before</li>
         </ul>
 
@@ -1112,7 +1112,7 @@ root_agent = <span class="tok-f">LlmAgent</span>(
         <pre><code>root_agent = <span class="tok-f">SequentialAgent</span>(
     name=<span class="tok-s">"ContentOrchestra"</span>,
     sub_agents=[
-        research_team,       <span class="tok-c"># a SequentialAgent</span>
+        research_team,       <span class="tok-c"># a ParallelAgent</span>
         outliner,            <span class="tok-c"># an LlmAgent</span>
         drafter,             <span class="tok-c"># an LlmAgent</span>
         refinement_loop,     <span class="tok-c"># a LoopAgent</span>
@@ -1180,7 +1180,7 @@ Requirements:
 - Accept JSON: <span class="tok-s">{"message": "..."}</span>
 - Load the matching agent from this project (single_agent,
   sequential_pipeline, parallel_research, loop_refinement,
-  content_orchestra) using ADK's Runner API.
+  mcp_travel, content_orchestra) using ADK's Runner API.
 - Return the agent's final response as JSON: <span class="tok-s">{"reply": "..."}</span>
 - Enable CORS so a local frontend can hit it.
 - Also create <span class="tok-s">backend/requirements.txt</span> with fastapi, uvicorn[standard].
@@ -1193,7 +1193,7 @@ Requirements:
           <li>Tell you the exact <code>uvicorn</code> command to start the server</li>
         </ol>
 
-        <p>Review the diff it shows. Approve it. Then run the install + start commands it gave you.</p>
+        <p>Review the diff it shows. Approve it. Stop <code>adk web</code> if it's still running on port 8000, then run the install + start commands it gave you.</p>
 
         <h2>Step 3 — Ask it to build a frontend</h2>
         <p>Once the backend is up, prompt Gemini CLI again:</p>
@@ -1203,7 +1203,7 @@ Now build a minimal frontend in <span class="tok-s">frontend/index.html</span>:
 
 - Single page, vanilla JS, no framework
 - A dropdown to pick the agent (single_agent, sequential_pipeline,
-  parallel_research, loop_refinement, content_orchestra)
+  parallel_research, loop_refinement, mcp_travel, content_orchestra)
 - A textarea for the user message
 - A Send button that POSTs to <span class="tok-s">http://localhost:8000/chat/{agent}</span>
 - Show the reply below in a styled message bubble
@@ -1248,7 +1248,7 @@ Now build a minimal frontend in <span class="tok-s">frontend/index.html</span>:
       <section class="step" data-step="11">
         <span class="badge">You did it</span>
         <h1>Next steps</h1>
-        <p class="lead">You've built five agents and learned every workflow primitive ADK offers. Here's where to go from here.</p>
+        <p class="lead">You've built six agents and learned every workflow primitive ADK offers. Here's where to go from here.</p>
 
         <h2>Keep building</h2>
         <ul>

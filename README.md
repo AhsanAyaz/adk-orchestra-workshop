@@ -45,7 +45,7 @@ Then open `index.html` in your browser and follow along.
 adk-orchestra-workshop/
 ├── index.html              # The workshop — open in browser
 ├── setup.sh                # One-shot installer
-├── requirements.txt        # Python deps (google-adk, python-dotenv)
+├── requirements.txt        # Python deps (google-adk, python-dotenv, mcp)
 ├── .env.example            # Template for your API key
 ├── single_agent/           # Agent 1
 ├── sequential_pipeline/    # Agent 2

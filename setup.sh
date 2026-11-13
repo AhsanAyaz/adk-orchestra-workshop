@@ -30,6 +30,10 @@ if ! command -v python3 >/dev/null; then
     exit 1
 fi
 PY_VER=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)'; then
+    echo "${YELLOW}Python ${PY_VER} found, but Python 3.10+ is required.${RESET}"
+    exit 1
+fi
 ok "Python ${PY_VER} detected"
 
 # ── 2. Virtual environment ────────────────────────────────────────────────
