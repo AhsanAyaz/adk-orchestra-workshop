@@ -451,7 +451,7 @@
         <li class="nav-item" data-step="7"><span class="nav-num">7</span> Loop refinement</li>
         <li class="nav-item" data-step="8"><span class="nav-num">8</span> MCP tool exercise</li>
         <li class="nav-item" data-step="9"><span class="nav-num">9</span> The full orchestra</li>
-        <li class="nav-item" data-step="10"><span class="nav-num">10</span> Vibe-code with Gemini CLI</li>
+        <li class="nav-item" data-step="10"><span class="nav-num">10</span> Vibe-code with Antigravity CLI</li>
         <li class="nav-item" data-step="11"><span class="nav-num">11</span> Next steps</li>
       </ul>
     </aside>
@@ -601,12 +601,12 @@
           <li>Creates a Python virtual environment in <code>.venv/</code></li>
           <li>Installs ADK and its Python dependencies</li>
           <li>Creates your <code>.env</code> file from the template</li>
-          <li>Asks if you want to install <strong>Gemini CLI</strong> (for the bonus step) — say yes if you have <code>npm</code></li>
+          <li>Asks if you want to install <strong>Antigravity CLI (<code>agy</code>)</strong> (for the bonus step)</li>
         </ul>
 
         <div class="callout note">
-          <div class="callout-title">About Gemini CLI</div>
-          <p>Gemini CLI is Google's command-line coding assistant — like Claude Code or Cursor, but in your terminal. We use it in the bonus step to scaffold a frontend and FastAPI backend on top of your agents. Optional, but fun. Requires Node.js.</p>
+          <div class="callout-title">About Antigravity CLI</div>
+          <p>Antigravity CLI (<code>agy</code>) is Google's command-line coding assistant in your terminal. We use it in the bonus step to scaffold a frontend and FastAPI backend on top of your agents. Optional, but fun.</p>
         </div>
 
         <h2>3. Add your API key</h2>
@@ -624,18 +624,18 @@ GOOGLE_API_KEY=<span class="tok-s">"paste-your-key-here"</span></code></pre>
 
         <p>Open the URL it prints (usually <code>http://localhost:8000</code>). You should see a dropdown listing the five agents. Pick any one and try chatting with it. If that works — you're ready.</p>
 
-        <h2>6. (Optional) Verify Gemini CLI</h2>
+        <h2>6. (Optional) Verify Antigravity CLI</h2>
         <p>If you installed it above, check it's working:</p>
-        <pre><code><span class="tok-f">gemini</span> --version
+        <pre><code><span class="tok-f">agy</span> --help
 <span class="tok-c"># or just run:</span>
-<span class="tok-f">gemini</span></code></pre>
-        <p>The first run will ask you to authenticate. Sign in with the same Google account you used for the API key.</p>
+<span class="tok-f">agy</span></code></pre>
+        <p>The first run will ask you to authenticate. Follow the on-screen prompts to sign in.</p>
 
         <div class="callout warn">
           <div class="callout-title">Stuck?</div>
           <p><strong><code>adk: command not found</code></strong> — your venv isn't active. Re-run <code>source .venv/bin/activate</code>.</p>
           <p><strong>401 error</strong> — your API key is wrong or missing from <code>.env</code>.</p>
-          <p><strong><code>gemini: command not found</code></strong> — re-run <code>./setup.sh</code> and say <strong>Y</strong> at the Gemini CLI prompt, or install manually: <code>npm install -g @google/gemini-cli</code></p>
+          <p><strong><code>agy: command not found</code></strong> — re-run <code>./setup.sh</code> and say <strong>Y</strong> at the Antigravity CLI prompt, or install manually: <code>curl -fsSL https://antigravity.google/cli/install.sh | bash</code></p>
         </div>
 
         <div class="step-footer">
@@ -1135,18 +1135,18 @@ root_agent = <span class="tok-f">LlmAgent</span>(
 
         <div class="step-footer">
           <button class="btn" data-prev>← Back</button>
-          <button class="btn primary" data-next>Vibe-code with Gemini CLI →</button>
+          <button class="btn primary" data-next>Vibe-code with Antigravity CLI →</button>
         </div>
       </section>
 
-      <!-- ───────── STEP 10 — GEMINI CLI BONUS ───────── -->
+      <!-- ───────── STEP 10 — ANTIGRAVITY CLI BONUS ───────── -->
       <section class="step" data-step="10">
         <span class="badge">Step 7 · Bonus · Vibe-Coding</span>
-        <h1>Build a UI &amp; backend with Gemini CLI</h1>
-        <p class="lead">You have agents. Now wrap them in a web app — without writing the boilerplate yourself. Gemini CLI does the typing.</p>
+        <h1>Build a UI &amp; backend with Antigravity CLI</h1>
+        <p class="lead">You have agents. Now wrap them in a web app — without writing the boilerplate yourself. Antigravity CLI does the typing.</p>
 
-        <h2>What is Gemini CLI?</h2>
-        <p><strong>Gemini CLI</strong> is Google's open-source command-line coding assistant. You point it at a folder, type what you want in plain English, and it reads/writes files, runs commands, and edits code. Think of it as a pair programmer that lives in your terminal.</p>
+        <h2>What is Antigravity CLI?</h2>
+        <p><strong>Antigravity CLI (<code>agy</code>)</strong> is Google's command-line coding assistant. You point it at a folder, type what you want in plain English, and it reads/writes files, runs commands, and edits code. Think of it as a pair programmer that lives in your terminal.</p>
         <p>For this bonus step we'll use it to scaffold:</p>
         <ul>
           <li>A <strong>FastAPI backend</strong> that exposes your ADK agents over HTTP</li>
@@ -1154,23 +1154,23 @@ root_agent = <span class="tok-f">LlmAgent</span>(
         </ul>
 
         <div class="callout note">
-          <div class="callout-title">Why both ADK and Gemini CLI?</div>
-          <p>ADK is the <em>runtime</em> — it runs your agents. Gemini CLI is the <em>builder</em> — it writes the code around them. ADK is what your app uses in production. Gemini CLI is the assistant you use while developing.</p>
+          <div class="callout-title">Why both ADK and Antigravity CLI?</div>
+          <p>ADK is the <em>runtime</em> — it runs your agents. Antigravity CLI is the <em>builder</em> — it writes the code around them. ADK is what your app uses in production. Antigravity CLI is the assistant you use while developing.</p>
         </div>
 
-        <h2>Step 1 — Start Gemini CLI</h2>
+        <h2>Step 1 — Start Antigravity CLI</h2>
         <p>From the workshop folder:</p>
         <pre><code><span class="tok-f">cd</span> path-to-project/adk-orchestra-workshop
-<span class="tok-f">gemini</span></code></pre>
-        <p>The first time you run it, Gemini CLI asks you to sign in. Use the same Google account as your API key. After that, you're inside an interactive session.</p>
+<span class="tok-f">agy</span></code></pre>
+        <p>The first time you run it, Antigravity CLI asks you to sign in. Follow the on-screen prompts. After that, you're inside an interactive session.</p>
 
         <div class="callout tip">
           <div class="callout-title">Tip — let it see your code</div>
-          <p>Run Gemini CLI from the project root so it has read access to all the agent folders. It will read <code>single_agent/agent.py</code>, <code>content_orchestra/agent.py</code>, etc., to understand how your agents work.</p>
+          <p>Run <code>agy</code> from the project root so it has read access to all the agent folders. It will read <code>single_agent/agent.py</code>, <code>content_orchestra/agent.py</code>, etc., to understand how your agents work.</p>
         </div>
 
         <h2>Step 2 — Ask it to build a FastAPI backend</h2>
-        <p>Paste this prompt into Gemini CLI:</p>
+        <p>Paste this prompt into Antigravity CLI:</p>
 
         <pre><code><span class="tok-c"># Prompt to paste:</span>
 Build a FastAPI backend in a new file called <span class="tok-s">backend/main.py</span>.
@@ -1186,7 +1186,7 @@ Requirements:
 - Also create <span class="tok-s">backend/requirements.txt</span> with fastapi, uvicorn[standard].
 - Show me how to run it.</code></pre>
 
-        <p>Gemini CLI will:</p>
+        <p>Antigravity CLI will:</p>
         <ol>
           <li>Read your existing agents to learn their structure</li>
           <li>Create <code>backend/main.py</code> and <code>backend/requirements.txt</code></li>
@@ -1196,7 +1196,7 @@ Requirements:
         <p>Review the diff it shows. Approve it. Stop <code>adk web</code> if it's still running on port 8000, then run the install + start commands it gave you.</p>
 
         <h2>Step 3 — Ask it to build a frontend</h2>
-        <p>Once the backend is up, prompt Gemini CLI again:</p>
+        <p>Once the backend is up, prompt Antigravity CLI again:</p>
 
         <pre><code><span class="tok-c"># Prompt to paste:</span>
 Now build a minimal frontend in <span class="tok-s">frontend/index.html</span>:
@@ -1224,18 +1224,18 @@ Now build a minimal frontend in <span class="tok-s">frontend/index.html</span>:
         <div class="exercise">
           <span class="exercise-tag">Exercise · Choose your own adventure</span>
           <h3>Build something real</h3>
-          <p>Pick one of these mini-projects and build it with Gemini CLI on top of your ADK agents:</p>
+          <p>Pick one of these mini-projects and build it with Antigravity CLI on top of your ADK agents:</p>
           <ol>
             <li><strong>Travel planner UI</strong> — wrap the <code>mcp_travel</code> agent in a search interface with date pickers and price filters.</li>
             <li><strong>Code review dashboard</strong> — paste in a Python snippet, run <code>sequential_pipeline</code>, show the writer/reviewer/refactorer outputs side by side.</li>
             <li><strong>Research report generator</strong> — give <code>content_orchestra</code> a topic and render the resulting article as styled markdown with a "regenerate section" button.</li>
           </ol>
-          <p>The whole point: you don't need to know FastAPI or HTML/CSS by heart. You direct, Gemini CLI types. Review carefully, run often, ship.</p>
+          <p>The whole point: you don't need to know FastAPI or HTML/CSS by heart. You direct, Antigravity CLI types. Review carefully, run often, ship.</p>
         </div>
 
         <div class="callout warn">
           <div class="callout-title">Trust but verify</div>
-          <p>Gemini CLI will sometimes write code that doesn't quite work. Always run what it produces and read the diffs. When something breaks, paste the error back in — it'll fix it.</p>
+          <p>Antigravity CLI will sometimes write code that doesn't quite work. Always run what it produces and read the diffs. When something breaks, paste the error back in — it'll fix it.</p>
         </div>
 
         <div class="step-footer">
