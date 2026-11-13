@@ -9,7 +9,7 @@ Open `index.html` in your browser for the full guided walkthrough. This README i
 ## Quick start
 
 ```bash
-# 1. Run setup (installs venv, deps, and optionally Gemini CLI)
+# 1. Run setup (installs venv, deps, and optionally Antigravity CLI)
 ./setup.sh
 
 # 2. Add your free API key to .env
@@ -61,7 +61,7 @@ Agent 5 (`mcp_travel/`) is built **by you** during the workshop — that's the M
 ## Requirements
 
 - **Python 3.10+**
-- **Node.js / npm** (for the MCP exercise and Gemini CLI bonus step)
+- **Node.js / npm** (for the MCP exercise)
 - A free **Google AI Studio API key** — no credit card needed
 
 ---
@@ -69,5 +69,5 @@ Agent 5 (`mcp_travel/`) is built **by you** during the workshop — that's the M
 ## Tools used
 
 - [Google ADK](https://google.github.io/adk-docs) — agent framework
-- [Gemini CLI](https://github.com/google-gemini/gemini-cli) — optional, for the vibe-coding bonus step
+- [Antigravity CLI (`agy`)](https://antigravity.google/docs) — optional, for the vibe-coding bonus step
 - [Model Context Protocol](https://modelcontextprotocol.io) — external tool integration

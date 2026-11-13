@@ -4,7 +4,7 @@
 #
 # Installs:
 #   • Python virtual env + ADK dependencies
-#   • Gemini CLI (via npm) — optional, prompted
+#   • Antigravity CLI (agy) — optional, prompted
 #
 # Re-run any time. Safe to run multiple times.
 #
@@ -60,27 +60,22 @@ else
     ok ".env already configured"
 fi
 
-# ── 5. Gemini CLI ─────────────────────────────────────────────────────────
+# ── 5. Antigravity CLI ────────────────────────────────────────────────────
 echo ""
-say "Checking Gemini CLI (optional, for vibe-coding bonus step)..."
-if command -v gemini >/dev/null 2>&1; then
-    GEMINI_VER=$(gemini --version 2>/dev/null || echo "?")
-    ok "Gemini CLI already installed (${GEMINI_VER})"
+say "Checking Antigravity CLI (optional, for vibe-coding bonus step)..."
+if command -v agy >/dev/null 2>&1; then
+    AGY_VER=$(agy --version 2>/dev/null || echo "installed")
+    ok "Antigravity CLI already installed (${AGY_VER})"
 else
-    if ! command -v npm >/dev/null 2>&1; then
-        warn "npm not found — skipping Gemini CLI install."
-        warn "Install Node.js from https://nodejs.org, then re-run ./setup.sh"
+    echo ""
+    read -rp "Install Antigravity CLI (agy) now? [Y/n] " ans
+    ans=${ans:-Y}
+    if [[ "$ans" =~ ^[Yy]$ ]]; then
+        say "Installing Antigravity CLI..."
+        curl -fsSL https://antigravity.google/cli/install.sh | bash
+        ok "Antigravity CLI installed — run 'agy' to start"
     else
-        echo ""
-        read -rp "Install Gemini CLI now via npm? [Y/n] " ans
-        ans=${ans:-Y}
-        if [[ "$ans" =~ ^[Yy]$ ]]; then
-            say "Installing @google/gemini-cli globally..."
-            npm install -g @google/gemini-cli
-            ok "Gemini CLI installed — run 'gemini' to start"
-        else
-            warn "Skipped. Install later with: npm install -g @google/gemini-cli"
-        fi
+        warn "Skipped. Install later with: curl -fsSL https://antigravity.google/cli/install.sh | bash"
     fi
 fi
 
